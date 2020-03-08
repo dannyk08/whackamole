@@ -5,16 +5,49 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
 	<title>Wackamole game</title>
-	<link href="styles/main.css" rel="stylesheet" type="text/css" />
+	<link href="https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap" rel="stylesheet">
+	<link href="styles/draft-5.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
-	<div id="gameBoard">
+	<div class="game">
+		<header class="header">
+			<h1 class="header-headline">Wackamole</h1>
+		</header>
+		<div id="gameBoard">
+			<div class="board">
+				<div class="scoreboard">
+					<p class="scoreboard-record">
+						<span class="arcade-font sm">Record</span>
+						<span class="arcade-font">0</span>
+					</p>
+					<p class="scoreboard-points">
+						<span class="arcade-font sm">Points</span>
+						<span class="arcade-font">0</span>
+					</p>
+					<p class="scoreboard-tracker">
+						<span class="arcade-font sm">Time</span>
+						<span class="arcade-font">0:00</span>
+					</p>
+				</div>
+
+				<div class="mole-field">
+					<div class="hole"><img class="mole hidden" id="453660768490" src="/images/mr-meseeks.png"><img class="dirt"
+							src="/images/dirt.png"></div>
+					<div class="hole"><img class="mole" id="1280547915142" src="/images/mr-meseeks.png"><img class="dirt"
+							src="/images/dirt.png"></div>
+					<div class="hole"><img class="mole hidden" id="967621495305" src="/images/mr-meseeks.png"><img class="dirt"
+							src="/images/dirt.png"></div>
+					<div class="hole"><img class="mole" id="242035882105" src="/images/mr-meseeks.png"><img class="dirt"
+							src="/images/dirt.png"></div>
+					<div class="hole"><img class="mole hidden" id="531378949795" src="/images/mr-meseeks.png"><img class="dirt"
+							src="/images/dirt.png"></div>
+				</div>
+			</div>
+		</div>
 	</div>
 
-	<script src="scripts/index.js">
-
-	</script>
+	<script src="scripts/draft-5.js"></script>
 </body>
 
 </html>

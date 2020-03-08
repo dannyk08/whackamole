@@ -1,7 +1,7 @@
 const GAME_PROPERTIES = {
   objects: {
     mole: {
-      image: '/images/mole.png'
+      image: '/images/mr-meseeks.png'
     },
     mallet: {
       image: '/images/mallet.png'
@@ -27,9 +27,9 @@ class WhackAMoleGame {
   constructor() {
     // TODO: start the countdown when the user clicks `start`
     // setTimeout(() => {
-      this._initialize()
-      this.scoreBoard.startCountDown()
-    // }, 10 * 1000);
+    this._initialize()
+    this.scoreBoard.startCountDown()
+    // }, 3 * 1000);
   }
 
   get isGameValid() {
@@ -130,7 +130,7 @@ class ScoreBoard {
   timeTrackerEl
   countdownInterval = null
   // maxTimeAllowed = 1000 * 60 * 3 // 3 minutes
-  maxTimeAllowed = 1000 * 20
+  maxTimeAllowed = 1000 * 60
 
   scoreBoardClass = 'scoreboard'
   scoreBoardPointsClass = 'scoreboard-points'
