@@ -126,6 +126,7 @@ class WhackAMoleGame {
 
 class ScoreBoard {
   boardEl
+  recordScoreEl
   scoreEl
   timeTrackerEl
   countdownInterval = null
@@ -133,8 +134,10 @@ class ScoreBoard {
   maxTimeAllowed = 1000 * 60
 
   scoreBoardClass = 'scoreboard'
+  scoreBoardPointsRecordClass = 'scoreboard-record'
   scoreBoardPointsClass = 'scoreboard-points'
   scoreBoardTimeTrackerClass = 'scoreboard-tracker'
+  scoreRecord = 0
   points = 0
   timeRemaining = 0
 
@@ -142,8 +145,11 @@ class ScoreBoard {
     this.initialize()
   }
 
+  get currentScoreRecord() {
+    return `${this.scoreRecord}pts`
+  }
   get currentScore() {
-    return `Score: ${this.points}pts`
+    return `${this.points}pts`
   }
   get timeLeft() {
     let minutes = Math.floor(this.timeRemaining / (1000 * 60))
@@ -151,19 +157,24 @@ class ScoreBoard {
     if (seconds < 10) {
       seconds = `0${seconds}`
     }
-    return `Time: ${minutes}:${seconds}`
+    if (minutes < 10) {
+      minutes = `0${minutes}`
+    }
+    return `${minutes}:${seconds}`
   }
 
   set updateScore(points) {
     this.points = points
-    this.scoreEl.innerText = this.currentScore
+    this.scoreEl.innerHTML = this._updateBoardComponent('Points', this.currentScore)
   }
 
   initialize() {
     this.boardEl = this._createBoardEl()
+    this.recordScoreEl = this._createHighScoreTracker()
     this.scoreEl = this._createPointsTracker()
     this.timeTrackerEl = this._createTimeTracker()
 
+    this.boardEl.appendChild(this.recordScoreEl)
     this.boardEl.appendChild(this.scoreEl)
     this.boardEl.appendChild(this.timeTrackerEl)
   }
@@ -171,12 +182,12 @@ class ScoreBoard {
   startCountDown() {
     if (this.countdownInterval == null) {
       this.timeRemaining = this.maxTimeAllowed
-      this.timeTrackerEl.innerText = this.timeLeft
+      this.timeTrackerEl.innerHTML = this._updateBoardComponent('Time', this.timeLeft)
 
       this.countdownInterval = setInterval(() => {
         if (this.timeRemaining > 0) {
           this.timeRemaining -= 1000
-          this.timeTrackerEl.innerText = this.timeLeft
+          this.timeTrackerEl.innerHTML = this._updateBoardComponent('Time', this.timeLeft)
         } else {
           clearInterval(this.countdownInterval)
           this.countdownInterval = null
@@ -195,15 +206,30 @@ class ScoreBoard {
   _createPointsTracker() {
     let pointsTracker = document.createElement('p')
     pointsTracker.classList.add(this.scoreBoardPointsClass)
-    pointsTracker.innerText = this.currentScore
+    pointsTracker.innerHTML = this._updateBoardComponent('Points', this.currentScore)
     return pointsTracker
   }
 
   _createTimeTracker() {
     let timeTracker = document.createElement('p')
     timeTracker.classList.add(this.scoreBoardTimeTrackerClass)
-    timeTracker.innerText = this.timeLeft
+    timeTracker.innerHTML = this._updateBoardComponent('Time', this.timeLeft)
     return timeTracker
+  }
+
+  _createHighScoreTracker() {
+    let recordTracker = document.createElement('p')
+    recordTracker.classList.add(this.scoreBoardPointsRecordClass)
+    // TODO: Update the highscore when the current game session is over
+    recordTracker.innerHTML = this._updateBoardComponent('Record', this.currentScoreRecord)
+    return recordTracker
+  }
+
+  _updateBoardComponent(label, currentScore) {
+    return `
+      <span class="arcade-font sm">${label}</span>
+      <span class="arcade-font">${currentScore}</span>
+    `
   }
 
 }
