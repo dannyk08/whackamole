@@ -60,10 +60,9 @@ p {
 
 body {
   background-color   : #252b3a;
-  background-image   : url(/images/mr-meeseeks-wallpaper.jpg);
+  background-image   : url(/images/mr-meeseeks-wallpaper-transparent.png);
   background-repeat  : no-repeat;
   background-position: right bottom;
-  background-size    : cover;
 }
 
 .header {
