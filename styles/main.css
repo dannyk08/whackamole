@@ -125,18 +125,19 @@ body {
 .start-game {
   background-color: #07d6ff;
   box-shadow      : 4px 4px 0px 0px #0188ff, -4px -4px 0px 0px #242a3a;
-  color           : #0f0e0d;
+  color           : #212121;
 }
 
 .home-screen {
   padding        : 1rem;
   display        : flex;
-  justify-content: space-evenly;
+  justify-content: center;
   color          : white;
   align-items    : center;
   flex           : 1;
-  max-height     : 90%;
+  max-height     : 75%;
   border-top     : 1px solid #07d6ff;
+  flex-direction : column;
 }
 
 .board {

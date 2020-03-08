@@ -25,10 +25,7 @@ class WhackAMoleGame {
   moleField
 
   constructor() {
-    // TODO: start the countdown when the user clicks `start`
-    // setTimeout(() => {
     this._initialize()
-    // }, 3 * 1000);
   }
 
   get isGameValid() {
@@ -39,14 +36,9 @@ class WhackAMoleGame {
     this._gameHome()
 
     document.addEventListener('click', this._gameClickListeners.bind(this), false)
-    // TODO:
-    // create a custom event listener to listen when the scoreboard countdown is at zero
-
+    document.addEventListener('whackamoleGameOver', this._handleGameOverEvent.bind(this), false)
   }
 
-  /**
-   * @param {MouseEvent} e 
-   */
   _gameClickListeners(e) {
     let currentTarget = e.target
     if (currentTarget.id == 'startGame') {
@@ -55,6 +47,11 @@ class WhackAMoleGame {
     if (currentTarget.className.includes('mole')) {
       this._handleClickedMole(currentTarget)
     }
+  }
+
+  _handleGameOverEvent(e) {
+    this.molesCollection = []
+    this._gameHome(true)
   }
 
   _handleClickStartGame() {
@@ -68,9 +65,6 @@ class WhackAMoleGame {
 
       this.scoreBoard.updateScore = this.scoreBoard.points += clickedMole.points
       clickedMole.hide()
-      // } else { // TODO: when custom event listener is created; perform this cleanup
-      //   this.moleField.innerHTML = ''
-      //   this.molesCollection = []
     }
   }
 
@@ -78,10 +72,10 @@ class WhackAMoleGame {
     return this.molesCollection.find(({ id }) => moleEl.id == id)
   }
 
-  _gameHome() {
+  _gameHome(gameOver) {
     this.boardEl = document.getElementById('gameBoard')
     this.boardEl.innerHTML = ''
-    this.boardEl.appendChild(this._createGameHomeEl())
+    this.boardEl.appendChild(this._createGameHomeEl(gameOver))
   }
 
   _gameStart() {
@@ -93,13 +87,18 @@ class WhackAMoleGame {
     this.scoreBoard.startCountDown()
   }
 
-  _createGameHomeEl() {
+  _createGameHomeEl(gameOver) {
     let gameStart = document.createElement('div')
     let homeScreen = document.createElement('div')
-    homeScreen.classList.add('home-screen')
-    homeScreen.innerHTML = `
-      <button id="startGame" class="button start-game arcade-font x-sm">Start Game</button>
+    let startGameAgain = `<h2>Game Over</h2>`
+    let startGameButton = `<button id="startGame" 
+      class="button start-game arcade-font x-sm">
+        Start Game
+      </button>
     `
+
+    homeScreen.classList.add('home-screen')
+    homeScreen.innerHTML = gameOver ? (startGameAgain + startGameButton) : startGameButton
 
     gameStart.classList.add('board')
     gameStart.appendChild(this.scoreBoard.boardEl)
@@ -155,13 +154,15 @@ class WhackAMoleGame {
 }
 
 class ScoreBoard {
+  gameOverEvent = new Event('whackamoleGameOver')
+
   boardEl
   recordScoreEl
   scoreEl
   timeTrackerEl
   countdownInterval = null
-  // maxTimeAllowed = 1000 * 60 * 3 // 3 minutes
-  maxTimeAllowed = 1000 * 60
+  // maxTimeAllowed = 1000 * 60 // 1 minute
+  maxTimeAllowed = 1000 * 30
 
   scoreBoardClass = 'scoreboard'
   scoreBoardPointsRecordClass = 'scoreboard-record'
@@ -193,6 +194,10 @@ class ScoreBoard {
     return `${minutes}:${seconds}`
   }
 
+  set updateScoreRecord(record) {
+    this.scoreRecord = record
+    this.recordScoreEl.innerHTML = this._updateBoardComponent('Record', this.currentScoreRecord)
+  }
   set updateScore(points) {
     this.points = points
     this.scoreEl.innerHTML = this._updateBoardComponent('Points', this.currentScore)
@@ -211,6 +216,7 @@ class ScoreBoard {
 
   startCountDown() {
     if (this.countdownInterval == null) {
+      this.updateScore = 0
       this.timeRemaining = this.maxTimeAllowed
       this.timeTrackerEl.innerHTML = this._updateBoardComponent('Time', this.timeLeft)
 
@@ -221,7 +227,11 @@ class ScoreBoard {
         } else {
           clearInterval(this.countdownInterval)
           this.countdownInterval = null
-          console.log('clearing interval', this.countdownInterval)
+
+          if (this.points > this.scoreRecord) {
+            this.updateScoreRecord = this.points
+          }
+          document.dispatchEvent(this.gameOverEvent)
         }
       }, 1000);
     }
@@ -265,7 +275,6 @@ class ScoreBoard {
 }
 
 class Mole {
-  active
   moleClass = 'mole'
   hiddenClass = 'hidden'
   // maxPoints = 10000
@@ -273,8 +282,6 @@ class Mole {
   minTimeout = 2000
 
   constructor(obj) {
-    // Mole should be hiding/showing if it's active
-    this.active = obj && obj.active || false
     this.currentTimeout = null
 
     this.points = this.generateRandomNumber(this.maxPoints)
