@@ -1,3 +1,9 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 html,
 body,
 .game {
@@ -48,9 +54,27 @@ h5 {
   font-size: 1.14rem;
 }
 
+h6,
+.arcade-font.x-sm {
+  font-size: 0.85rem;
+}
+
 img {
   max-width: 100%;
   flex     : 1;
+}
+
+button {
+  background    : white;
+  height        : 4rem;
+  width         : 10rem;
+  padding       : .5rem;
+  text-align    : center;
+  font-family   : 'Press Start 2P', 'Courier New', Courier, monospace;
+  border        : 0px solid transparent;
+  cursor        : pointer;
+  text-transform: uppercase;
+  font-size     : 0.8rem;
 }
 
 p {
@@ -96,6 +120,23 @@ body {
   flex               : 1;
   display            : flex;
   justify-content    : center;
+}
+
+.start-game {
+  background-color: #07d6ff;
+  box-shadow      : 4px 4px 0px 0px #0188ff, -4px -4px 0px 0px #242a3a;
+  color           : #0f0e0d;
+}
+
+.home-screen {
+  padding        : 1rem;
+  display        : flex;
+  justify-content: space-evenly;
+  color          : white;
+  align-items    : center;
+  flex           : 1;
+  max-height     : 90%;
+  border-top     : 1px solid #07d6ff;
 }
 
 .board {

@@ -28,7 +28,6 @@ class WhackAMoleGame {
     // TODO: start the countdown when the user clicks `start`
     // setTimeout(() => {
     this._initialize()
-    this.scoreBoard.startCountDown()
     // }, 3 * 1000);
   }
 
@@ -37,8 +36,7 @@ class WhackAMoleGame {
   }
 
   _initialize() {
-    this.molesCollection = this._createMolesCollection()
-    this._createBoard()
+    this._gameHome()
 
     document.addEventListener('click', this._gameClickListeners.bind(this), false)
     // TODO:
@@ -46,15 +44,21 @@ class WhackAMoleGame {
 
   }
 
+  /**
+   * @param {MouseEvent} e 
+   */
   _gameClickListeners(e) {
     let currentTarget = e.target
+    if (currentTarget.id == 'startGame') {
+      this._handleClickStartGame()
+    }
     if (currentTarget.className.includes('mole')) {
       this._handleClickedMole(currentTarget)
     }
   }
 
-  _getClickedMole(moleEl) {
-    return this.molesCollection.find(({ id }) => moleEl.id == id)
+  _handleClickStartGame() {
+    this._gameStart()
   }
 
   _handleClickedMole(moleEl) {
@@ -64,27 +68,53 @@ class WhackAMoleGame {
 
       this.scoreBoard.updateScore = this.scoreBoard.points += clickedMole.points
       clickedMole.hide()
-    } else { // TODO: when custom event listener is created; perform this cleanup
-      this.moleField.innerHTML = ''
-      this.molesCollection = []
+      // } else { // TODO: when custom event listener is created; perform this cleanup
+      //   this.moleField.innerHTML = ''
+      //   this.molesCollection = []
     }
   }
 
-  _createBoard() {
-    this.boardEl = document.getElementById('gameBoard')
-    this.boardEl.innerHTML = ''
-    this.boardEl.appendChild(this._createContentBoard())
+  _getClickedMole(moleEl) {
+    return this.molesCollection.find(({ id }) => moleEl.id == id)
   }
 
-  _createContentBoard() {
-    let board = document.createElement('div')
-    this.moleField = this._createMoleField()
+  _gameHome() {
+    this.boardEl = document.getElementById('gameBoard')
+    this.boardEl.innerHTML = ''
+    this.boardEl.appendChild(this._createGameHomeEl())
+  }
 
-    board.classList.add('board')
+  _gameStart() {
+    this.molesCollection = this._createMolesCollection()
+
+    this.boardEl = document.getElementById('gameBoard')
+    this._createBoardEl()
+
+    this.scoreBoard.startCountDown()
+  }
+
+  _createGameHomeEl() {
+    let gameStart = document.createElement('div')
+    let homeScreen = document.createElement('div')
+    homeScreen.classList.add('home-screen')
+    homeScreen.innerHTML = `
+      <button id="startGame" class="button start-game arcade-font x-sm">Start Game</button>
+    `
+
+    gameStart.classList.add('board')
+    gameStart.appendChild(this.scoreBoard.boardEl)
+    gameStart.appendChild(homeScreen)
+
+    return gameStart
+  }
+
+  _createBoardEl() {
+    this.moleField = this._createMoleField()
+    let [board] = document.getElementsByClassName('board')
+
+    board.innerHTML = ''
     board.appendChild(this.scoreBoard.boardEl)
     board.appendChild(this.moleField)
-
-    return board
   }
 
   _createMoleField() {
