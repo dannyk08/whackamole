@@ -1,0 +1,14 @@
+{
+  "name": "whackamole",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:dannyk08/whackamole.git",
+  "author": "Daniel Romero <romerodaniel.k90@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "http-server ."
+  },
+  "devDependencies": {
+    "http-server": "^0.12.1"
+  }
+}
