@@ -35,6 +35,11 @@ class WhackAMoleGame {
   _initialize() {
     this._gameHome()
 
+    let storageScoreRecord = localStorage.getItem('whackamoleScoreRecord')
+    if (storageScoreRecord != null) {
+      this.scoreBoard.updateScoreRecord = storageScoreRecord
+    }
+
     document.addEventListener('click', this._gameClickListeners.bind(this), false)
     document.addEventListener('whackamoleGameOver', this._handleGameOverEvent.bind(this), false)
   }
@@ -230,6 +235,7 @@ class ScoreBoard {
 
           if (this.points > this.scoreRecord) {
             this.updateScoreRecord = this.points
+            localStorage.setItem('whackamoleScoreRecord', this.points)
           }
           document.dispatchEvent(this.gameOverEvent)
         }
