@@ -19,113 +19,96 @@ window.onload = function onDocumentLoad() {
 }
 
 class WhackAMoleGame {
+  boardSize = 5
+  scoreBoard = new ScoreBoard()
   boardEl
-  // boardSize = 5
-  boardSize = 1
-  board = {
-    score: 0,
-    timeLeft: 0
-  }
+  moleField
 
   constructor() {
-    this.initialize()
+    // TODO: start the countdown when the user clicks `start`
+    // setTimeout(() => {
+      this._initialize()
+      this.scoreBoard.startCountDown()
+    // }, 10 * 1000);
   }
 
-  initialize() {
-    this.molesCollection = this.createMolesCollection()
-
-    this.boardEl = document.getElementById('gameBoard')
-    this.boardEl.innerHTML = ''
-
-    this.boardEl.appendChild(this.createBoard())
-    document.addEventListener('click', this.gameClickListeners.bind(this), false)
+  get isGameValid() {
+    return this.scoreBoard.timeRemaining > 0
   }
 
-  gameClickListeners(e) {
+  _initialize() {
+    this.molesCollection = this._createMolesCollection()
+    this._createBoard()
+
+    document.addEventListener('click', this._gameClickListeners.bind(this), false)
+    // TODO:
+    // create a custom event listener to listen when the scoreboard countdown is at zero
+
+  }
+
+  _gameClickListeners(e) {
     let currentTarget = e.target
-
-    if (currentTarget.className.includes('hole')) {
-      let mole = this.getClickedMole(currentTarget.querySelector('.mole'))
-      mole.show()
-    }
-
     if (currentTarget.className.includes('mole')) {
-      this.handleClickedMole(currentTarget)
+      this._handleClickedMole(currentTarget)
     }
   }
 
-  getClickedMole(moleEl) {
+  _getClickedMole(moleEl) {
     return this.molesCollection.find(({ id }) => moleEl.id == id)
   }
 
-  handleClickedMole(moleEl) {
-    // console.log({ moleEl })
-    let clickedMole = this.getClickedMole(moleEl)
-    if (!clickedMole) return
-    // console.log({ clickedMole })
-    this.board.score += clickedMole.points
-    console.log('new score:', this.board.score)
-    clickedMole.hide()
+  _handleClickedMole(moleEl) {
+    if (this.isGameValid) {
+      let clickedMole = this._getClickedMole(moleEl)
+      if (!clickedMole) return
+
+      this.scoreBoard.updateScore = this.scoreBoard.points += clickedMole.points
+      clickedMole.hide()
+    } else { // TODO: when custom event listener is created; perform this cleanup
+      this.moleField.innerHTML = ''
+      this.molesCollection = []
+    }
   }
 
-  createBoard() {
+  _createBoard() {
+    this.boardEl = document.getElementById('gameBoard')
+    this.boardEl.innerHTML = ''
+    this.boardEl.appendChild(this._createContentBoard())
+  }
+
+  _createContentBoard() {
     let board = document.createElement('div')
-    let moleField = this.createMoleField()
-    let scoreBoard = this.createScoreBoard()
+    this.moleField = this._createMoleField()
 
     board.classList.add('board')
-    board.appendChild(scoreBoard)
-    board.appendChild(moleField)
+    board.appendChild(this.scoreBoard.boardEl)
+    board.appendChild(this.moleField)
 
     return board
   }
 
-  getCurrentScore(points) {
-    return `Score: ${points}pts`
-  }
-  getTimeLeft(time) {
-    return `Time: ${time}`
-  }
-
-  createScoreBoard() {
-    let scoreBoard = document.createElement('div')
-    let pointsTracker = document.createElement('p')
-    let timeTracker = document.createElement('p')
-
-    scoreBoard.classList.add('score-board')
-    pointsTracker.innerText = this.getCurrentScore(this.board.score)
-    pointsTracker.classList.add('score-board-points')
-    timeTracker.innerText = this.getTimeLeft(this.board.timeLeft)
-    pointsTracker.classList.add('score-board-timeleft')
-
-    scoreBoard.appendChild(pointsTracker)
-    scoreBoard.appendChild(timeTracker)
-
-    return scoreBoard
-  }
-
-  createMoleField() {
+  _createMoleField() {
     let field = document.createElement('div')
     field.classList.add('mole-field')
 
     this.molesCollection.forEach(mole => {
-      let hole = this.createHole(mole)
+      let hole = this._createHole(mole)
       field.appendChild(hole)
     })
 
     return field
   }
 
-  createDirtImage() {
+  _createDirtImage() {
     let dirtImage = document.createElement('img')
     dirtImage.classList.add('dirt')
     dirtImage.setAttribute('src', GAME_PROPERTIES.objects.dirt.image)
     return dirtImage
   }
 
-  createHole(mole) {
+  _createHole(mole) {
     let hole = document.createElement('div')
-    let dirtImage = this.createDirtImage()
+    let dirtImage = this._createDirtImage()
 
     hole.classList.add('hole')
     hole.appendChild(mole.domElement)
@@ -134,68 +117,154 @@ class WhackAMoleGame {
     return hole
   }
 
-  createMolesCollection() {
-    let collection = []
-    for (let i = 0; i < this.boardSize; i++) {
-      collection.push(new Mole())
-    }
-    console.log(collection)
-    return collection
+  _createMolesCollection() {
+    return Array
+      .from(new Array(this.boardSize).fill(null))
+      .map(() => new Mole())
   }
 }
 
-class Mole {
-  moleClass = 'mole'
-  hiddenClass = 'hidden'
-  maxPoints = 10000
-  minTimeout = 2000
+class ScoreBoard {
+  boardEl
+  scoreEl
+  timeTrackerEl
+  countdownInterval = null
+  // maxTimeAllowed = 1000 * 60 * 3 // 3 minutes
+  maxTimeAllowed = 1000 * 20
+
+  scoreBoardClass = 'scoreboard'
+  scoreBoardPointsClass = 'scoreboard-points'
+  scoreBoardTimeTrackerClass = 'scoreboard-tracker'
+  points = 0
+  timeRemaining = 0
 
   constructor() {
-    this.currentTimeout = null
-
-    this.points = this.generateRandomNumber(this.maxPoints)
-    this.timeRemaining = this.generateRandomNumber()
-    this.id = this.generateRandomNumber(Date.now())
-
-    this.domElement = this.createImg()
-    this.setHideTimeout()
+    this.initialize()
   }
 
-  isMoleHidden() {
-    return this.domElement.classList.contains(this.hiddenClass)
+  get currentScore() {
+    return `Score: ${this.points}pts`
+  }
+  get timeLeft() {
+    let minutes = Math.floor(this.timeRemaining / (1000 * 60))
+    let seconds = Math.floor((this.timeRemaining / 1000) % 60)
+    if (seconds < 10) {
+      seconds = `0${seconds}`
+    }
+    return `Time: ${minutes}:${seconds}`
   }
 
-  clearCurrentTimeout() {
-    clearTimeout(this.currentTimeout)
-    this.currentTimeout = null
+  set updateScore(points) {
+    this.points = points
+    this.scoreEl.innerText = this.currentScore
   }
 
-  resetCurrentTimeout() {
-    console.log('resetCurrentTimeout')
-    this.clearCurrentTimeout()
-    this.timeRemaining = this.generateRandomNumber()
-    this.setHideTimeout()
+  initialize() {
+    this.boardEl = this._createBoardEl()
+    this.scoreEl = this._createPointsTracker()
+    this.timeTrackerEl = this._createTimeTracker()
+
+    this.boardEl.appendChild(this.scoreEl)
+    this.boardEl.appendChild(this.timeTrackerEl)
   }
 
-  setHideTimeout() {
-    if (this.currentTimeout == null) {
-      this.show()
-      this.currentTimeout = setTimeout(this.handleHideTimeout.bind(this), Math.max(this.minTimeout, this.timeRemaining));
-      console.log('timeout set:', this)
+  startCountDown() {
+    if (this.countdownInterval == null) {
+      this.timeRemaining = this.maxTimeAllowed
+      this.timeTrackerEl.innerText = this.timeLeft
+
+      this.countdownInterval = setInterval(() => {
+        if (this.timeRemaining > 0) {
+          this.timeRemaining -= 1000
+          this.timeTrackerEl.innerText = this.timeLeft
+        } else {
+          clearInterval(this.countdownInterval)
+          this.countdownInterval = null
+          console.log('clearing interval', this.countdownInterval)
+        }
+      }, 1000);
     }
   }
 
-  handleHideTimeout() {
-    this.clearCurrentTimeout()
-    this.hide()
-    console.log('timeout done:', this)
+  _createBoardEl() {
+    let scoreBoard = document.createElement('div')
+    scoreBoard.classList.add(this.scoreBoardClass)
+    return scoreBoard
+  }
+
+  _createPointsTracker() {
+    let pointsTracker = document.createElement('p')
+    pointsTracker.classList.add(this.scoreBoardPointsClass)
+    pointsTracker.innerText = this.currentScore
+    return pointsTracker
+  }
+
+  _createTimeTracker() {
+    let timeTracker = document.createElement('p')
+    timeTracker.classList.add(this.scoreBoardTimeTrackerClass)
+    timeTracker.innerText = this.timeLeft
+    return timeTracker
+  }
+
+}
+
+class Mole {
+  active
+  moleClass = 'mole'
+  hiddenClass = 'hidden'
+  // maxPoints = 10000
+  maxPoints = 250
+  minTimeout = 2000
+
+  constructor(obj) {
+    // Mole should be hiding/showing if it's active
+    this.active = obj && obj.active || false
+    this.currentTimeout = null
+
+    this.points = this.generateRandomNumber(this.maxPoints)
+    this.timeRemaining = this.generateRandomTimeout()
+    this.id = this.generateRandomNumber(Date.now())
+
+    this.domElement = this._createImgEl()
+    this._setHideTimeout()
+  }
+
+  get isMoleHidden() {
+    return this.domElement.classList.contains(this.hiddenClass)
   }
 
   generateRandomNumber(limit = 4000) {
     return Math.floor(limit * Math.random())
   }
 
-  createImg() {
+  generateRandomTimeout(num) {
+    return Math.max(this.minTimeout, this.generateRandomNumber(num))
+  }
+
+  _clearCurrentTimeout() {
+    clearTimeout(this.currentTimeout)
+    this.currentTimeout = null
+  }
+
+  _resetCurrentTimeout() {
+    this._clearCurrentTimeout()
+    this.timeRemaining = this.generateRandomTimeout()
+    this._setHideTimeout()
+  }
+
+  _setHideTimeout() {
+    if (this.currentTimeout == null) {
+      this.show()
+      this.currentTimeout = setTimeout(this._handleHideTimeout.bind(this), this.timeRemaining);
+    }
+  }
+
+  _handleHideTimeout() {
+    this._clearCurrentTimeout()
+    this.hide()
+  }
+
+  _createImgEl() {
     let image = document.createElement('img')
     image.classList.add(this.moleClass)
     image.id = this.id
@@ -204,22 +273,17 @@ class Mole {
   }
 
   hide() {
-    if (!this.isMoleHidden()) {
+    if (!this.isMoleHidden) {
       this.domElement.classList.add(this.hiddenClass)
-
       setTimeout(() => {
-        this.resetCurrentTimeout()
-        // this.show()
-      }, this.minTimeout);
-      console.log('hiding', this.domElement)
+        this._resetCurrentTimeout()
+      }, this.generateRandomTimeout());
     }
   }
 
   show() {
-    if (this.isMoleHidden()) {
+    if (this.isMoleHidden) {
       this.domElement.classList.remove(this.hiddenClass)
-      console.log('showing', this.domElement)
     }
-    console.log(`@show()`, this.domElement.classList)
   }
 }
