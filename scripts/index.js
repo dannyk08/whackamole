@@ -18,9 +18,56 @@ window.onload = function onDocumentLoad() {
   new WhackAMoleGame()
 }
 
+class Mallet {
+  cursorEl
+  isDownTimeout
+
+  constructor() {
+    this.isDownTimeout = null
+    this.cursorEl = this._createCursor()
+    document.body.appendChild(this.cursorEl)
+  }
+
+  _createCursor() {
+    let cursor = document.createElement('img')
+    cursor.classList.add('mallet')
+    cursor.classList.add('hide')
+    cursor.setAttribute('src', GAME_PROPERTIES.objects.mallet.image)
+    return cursor
+  }
+
+  _transformPx(value) {
+    return `${value}px`
+  }
+
+  onCursorMove(e) {
+    this.cursorEl.style.top = this._transformPx(Math.floor(e.pageY - 32))
+    this.cursorEl.style.left = this._transformPx(Math.floor(e.pageX - 21.5))
+  }
+
+  onMalletDown() {
+    if (this.isDownTimeout != null) {
+      clearTimeout(this.isDownTimeout)
+      this.isDownTimeout = null
+      this.cursorEl.classList.remove('down')
+    } else {
+      this.cursorEl.classList.add('down')
+      this.isDownTimeout = setTimeout(() => {
+        clearTimeout(this.isDownTimeout)
+        this.isDownTimeout = null
+
+        this.cursorEl.classList.remove('down')
+      }, 100);
+    }
+
+  }
+
+}
+
 class WhackAMoleGame {
   boardSize = 5
   scoreBoard = new ScoreBoard()
+  mallet = new Mallet()
   boardEl
   moleField
 
@@ -42,9 +89,12 @@ class WhackAMoleGame {
 
     document.addEventListener('click', this._gameClickListeners.bind(this), false)
     document.addEventListener('whackamoleGameOver', this._handleGameOverEvent.bind(this), false)
+    document.addEventListener('mousemove', this.mallet.onCursorMove.bind(this.mallet), false)
   }
 
   _gameClickListeners(e) {
+    this.mallet.onMalletDown(e)
+
     let currentTarget = e.target
     if (currentTarget.id == 'startGame') {
       this._handleClickStartGame()
@@ -55,6 +105,7 @@ class WhackAMoleGame {
   }
 
   _handleGameOverEvent(e) {
+    this.mallet.cursorEl.classList.add('hide')
     this.molesCollection = []
     this._gameHome(true)
   }
@@ -84,6 +135,7 @@ class WhackAMoleGame {
   }
 
   _gameStart() {
+    this.mallet.cursorEl.classList.remove('hide')
     this.molesCollection = this._createMolesCollection()
 
     this.boardEl = document.getElementById('gameBoard')
@@ -266,7 +318,6 @@ class ScoreBoard {
   _createHighScoreTracker() {
     let recordTracker = document.createElement('p')
     recordTracker.classList.add(this.scoreBoardPointsRecordClass)
-    // TODO: Update the highscore when the current game session is over
     recordTracker.innerHTML = this._updateBoardComponent('Record', this.currentScoreRecord)
     return recordTracker
   }

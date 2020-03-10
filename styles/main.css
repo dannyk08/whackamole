@@ -1,3 +1,13 @@
+@keyframes malletDown {
+  0% {
+    transform: rotate(0);
+  }
+
+  100% {
+    transform: rotate(-37deg) scale(1.75);
+  }
+}
+
 *,
 *::before,
 *::after {
@@ -119,6 +129,25 @@ body {
   justify-content: center;
 }
 
+.mallet {
+  position        : absolute;
+  top             : 0;
+  left            : 0;
+  height          : 4rem;
+  pointer-events  : none;
+  transform-origin: bottom right;
+  transition      : all .125s ease-out;
+  z-index         : 9;
+}
+
+.mallet.hide {
+  display: none;
+}
+
+.mallet.down {
+  animation: .075s malletDown ease-out;
+}
+
 .start-game {
   background-color: #07d6ff;
   box-shadow      : 4px 4px 0px 0px #0188ff, -4px -4px 0px 0px #242a3a;
@@ -163,17 +192,17 @@ body {
 }
 
 .mole-field {
-  flex           : 1;
-  display        : flex;
-  flex-wrap      : wrap;
-  justify-content: center;
-  align-items    : center;
-  padding        : 1rem;
-  background     : #fbfbfb;
-  border         : 3px solid #222;
-  margin-bottom  : 2rem;
-  max-height     : 40rem;
-  cursor         : url('/images/cursor-mallet.png'), auto;
+  flex              : 1;
+  display           : flex;
+  flex-wrap         : wrap;
+  justify-content   : center;
+  align-items       : center;
+  padding           : 1rem;
+  background        : #fbfbfb;
+  border            : 3px solid #222;
+  margin-bottom     : 2rem;
+  max-height        : 40rem;
+  /* cursor         : url('/images/cursor-mallet.png'), auto; */
 }
 
 .hole {
