@@ -7,7 +7,9 @@ const GAME_PROPERTIES = {
       image: '/images/mallet.png'
     },
     dirt: {
-      image: '/images/dirt.png'
+      // image: '/images/dirt.png'
+      // image: '/images/black-hole-purple.png',
+      image: '/images/black-hole.png',
     }
   }
 }
@@ -41,8 +43,8 @@ class Mallet {
   }
 
   onCursorMove(e) {
-    this.cursorEl.style.top = this._transformPx(Math.floor(e.pageY - 32))
-    this.cursorEl.style.left = this._transformPx(Math.floor(e.pageX - 21.5))
+    this.cursorEl.style.top = this._transformPx(Math.floor(e.pageY - 44))
+    this.cursorEl.style.left = this._transformPx(Math.floor(e.pageX - 30))
   }
 
   onMalletDown() {
@@ -188,6 +190,7 @@ class WhackAMoleGame {
   _createDirtImage() {
     let dirtImage = document.createElement('img')
     dirtImage.classList.add('dirt')
+    dirtImage.classList.add('rotate')
     dirtImage.setAttribute('src', GAME_PROPERTIES.objects.dirt.image)
     return dirtImage
   }
