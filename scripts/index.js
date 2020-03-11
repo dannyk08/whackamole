@@ -72,6 +72,7 @@ class WhackAMoleGame {
   mallet = new Mallet()
   boardEl
   moleField
+  gameStartInterval
 
   constructor() {
     this._initialize()
@@ -113,7 +114,18 @@ class WhackAMoleGame {
   }
 
   _handleClickStartGame() {
-    this._gameStart()
+    if (this.gameStartInterval == null) {
+      let countDown = 3000
+      this.gameStartInterval = setInterval(() => {
+        if (countDown < 0) {
+          clearInterval(this.gameStartInterval)
+          this.gameStartInterval = null
+          setTimeout(this._gameStart.bind(this), 0);
+        }
+        this._createAwaitingGameEl(countDown / 1000)
+        countDown -= 1000
+      }, 1000);
+    }
   }
 
   _handleClickedMole(moleEl) {
@@ -164,6 +176,15 @@ class WhackAMoleGame {
     gameStart.appendChild(homeScreen)
 
     return gameStart
+  }
+
+  _createAwaitingGameEl(seconds) {
+    let [board] = document.getElementsByClassName('board')
+    board.innerHTML = `
+      <div class="board-waiting">
+        <h3>Ready? ${seconds}</h3>
+      </div>
+    `
   }
 
   _createBoardEl() {
