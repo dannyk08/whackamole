@@ -1,14 +1,20 @@
 const GAME_PROPERTIES = {
   objects: {
+    soundclips: {
+      whack: new Audio('/soundsclips/mallet-inpact-thump.mp3'),
+      yesmaam: new Audio('/soundsclips/yesmaam.mp3'),
+      alldone: new Audio('/soundsclips/alldone.mp3'),
+      exist: new Audio('/soundsclips/exist.mp3'),
+      try: new Audio('/soundsclips/try.mp3'),
+      whatgot: new Audio('/soundsclips/whatgot.mp3'),
+    },
     mole: {
       image: '/images/mr-meseeks.png'
     },
     mallet: {
-      image: '/images/mallet.png'
+      image: '/images/cursor-mallet.png'
     },
     dirt: {
-      // image: '/images/dirt.png'
-      // image: '/images/black-hole-purple.png',
       image: '/images/black-hole.png',
     }
   }
@@ -73,6 +79,15 @@ class WhackAMoleGame {
   boardEl
   moleField
   gameStartInterval
+  gameStartSoundCLips = [
+    'try',
+    'whatgot',
+    'yesmaam',
+  ]
+  gameOverSoundClips = [
+    'alldone',
+    'exist'
+  ]
 
   constructor() {
     this._initialize()
@@ -111,6 +126,7 @@ class WhackAMoleGame {
     this.mallet.cursorEl.classList.add('hide')
     this.molesCollection = []
     this._gameHome(true)
+    this._playRandomGameOverSoundClip()
   }
 
   _handleClickStartGame() {
@@ -120,6 +136,7 @@ class WhackAMoleGame {
         if (countDown < 0) {
           clearInterval(this.gameStartInterval)
           this.gameStartInterval = null
+          this._playRandomStartGameSoundClip()
           setTimeout(this._gameStart.bind(this), 0);
         }
         this._createAwaitingGameEl(countDown / 1000)
@@ -133,6 +150,7 @@ class WhackAMoleGame {
       let clickedMole = this._getClickedMole(moleEl)
       if (!clickedMole) return
 
+      this._playMoleWhackedSoundClip()
       this.scoreBoard.updateScore = this.scoreBoard.points += clickedMole.points
       clickedMole.hide()
     }
@@ -140,6 +158,33 @@ class WhackAMoleGame {
 
   _getClickedMole(moleEl) {
     return this.molesCollection.find(({ id }) => moleEl.id == id)
+  }
+
+  _generateRandomNumber(limit = 1) {
+    Math.floor(Math.random() * limit)
+  }
+
+  _playMoleWhackedSoundClip() {
+    this._handleSoundClipPlaybackConflicts(GAME_PROPERTIES.objects.soundclips.whack)
+  }
+
+  _playRandomGameOverSoundClip() {
+    let key = this.gameOverSoundClips[this._generateRandomNumber(this.gameOverSoundClips.length)]
+    this._handleSoundClipPlaybackConflicts(GAME_PROPERTIES.objects.soundclips[key])
+  }
+
+  _playRandomStartGameSoundClip() {
+    let key = this.gameStartSoundCLips[this._generateRandomNumber(this.gameStartSoundCLips.length)]
+    this._handleSoundClipPlaybackConflicts(GAME_PROPERTIES.objects.soundclips[key])
+  }
+
+  _handleSoundClipPlaybackConflicts(soundClip) {
+    if (soundClip.paused) {
+      soundClip.play()
+    } else {
+      soundClip.pause()
+      soundClip.currentTime = 0
+    }
   }
 
   _gameHome(gameOver) {
