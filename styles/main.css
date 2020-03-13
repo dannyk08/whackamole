@@ -24,6 +24,17 @@
   box-sizing: border-box;
 }
 
+:root {
+  /* --primary-theme-color        :#03bef1; */
+  --primary-theme-color           : #07d6ff;
+  --secondary-theme-color         : #222;
+  --secondary-theme-contrast-color: #fff;
+  --tertiary-theme-color          : #F89235;
+  --body-background-color         : #252b3a;
+  --bright-theme-shadow           : #0188ff;
+  --dark-theme-shadow             : #042a4f;
+}
+
 html,
 body,
 .game {
@@ -84,7 +95,7 @@ img {
 }
 
 button {
-  background    : white;
+  background    : var(--secondary-theme-contrast-color);
   height        : 4rem;
   width         : 10rem;
   padding       : .5rem;
@@ -102,7 +113,7 @@ p {
 }
 
 body {
-  background-color   : #252b3a;
+  background-color   : var(--body-background-color);
   background-image   : url(/images/mr-meeseeks-wallpaper-transparent.png);
   background-repeat  : no-repeat;
   background-position: right bottom;
@@ -116,8 +127,8 @@ body {
 .header-headline {
   position   : relative;
   max-width  : 65rem;
-  color      : #07d6ff;
-  text-shadow: 3px 0px #042a4f, -4px -3px 0px #0188ff;
+  color      : var(--primary-theme-color);
+  text-shadow: 3px 0px var(--dark-theme-shadow), -4px -3px 0px var(--bright-theme-shadow);
 }
 
 .header-headline::after {
@@ -159,20 +170,20 @@ body {
 }
 
 .start-game {
-  background-color: #07d6ff;
-  box-shadow      : 4px 4px 0px 0px #0188ff, -4px -4px 0px 0px #242a3a;
-  color           : #212121;
+  background-color: var(--primary-theme-color);
+  box-shadow      : 4px 4px 0px 0px var(--bright-theme-shadow), -4px -4px 0px 0px var(--dark-theme-shadow);
+  color           : var(--secondary-theme-color);
 }
 
 .home-screen {
   padding        : 1rem;
   display        : flex;
   justify-content: center;
-  color          : white;
+  color          : var(--secondary-theme-contrast-color);
   align-items    : center;
   flex           : 1;
   max-height     : 75%;
-  border-top     : 1px solid #07d6ff;
+  border-top     : 1px solid var(--primary-theme-color);
   flex-direction : column;
 }
 
@@ -181,6 +192,7 @@ body {
   display       : flex;
   flex-direction: column;
   max-width     : 60rem;
+  transition    : width 1s ease-out, height 1s ease-out;
 }
 
 .board-waiting {
@@ -188,16 +200,16 @@ body {
   display        : flex;
   justify-content: center;
   align-items    : center;
-  color          : #c18935;
-  border         : 1px solid #07d6ff;
+  color          : var(--tertiary-theme-color);
+  border         : 1px solid var(--primary-theme-color);
 }
 
 .scoreboard {
   padding        : 1rem;
   display        : flex;
   justify-content: space-evenly;
-  background     : #222;
-  color          : white;
+  background     : var(--secondary-theme-color);
+  color          : var(--secondary-theme-contrast-color);
   align-items    : center;
   min-height     : 6rem;
 }
@@ -217,8 +229,8 @@ body {
   justify-content: center;
   align-items    : center;
   padding        : 1rem;
-  background     : #fbfbfb;
-  border         : 3px solid #222;
+  background     : var(--secondary-theme-contrast-color);
+  border         : 3px solid var(--secondary-theme-color);
   margin-bottom  : 2rem;
   max-height     : 40rem;
 }
