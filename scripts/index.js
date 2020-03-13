@@ -161,7 +161,7 @@ class WhackAMoleGame {
   }
 
   _generateRandomNumber(limit = 1) {
-    Math.floor(Math.random() * limit)
+    return Math.floor(Math.random() * limit)
   }
 
   _playMoleWhackedSoundClip() {
