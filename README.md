@@ -1,8 +1,8 @@
 # Whackamole
+A game of whack-a-mole based on a science fiction show
 
-### What
-Whack a mole in vanilla js/html/css
+### Building blocks
+Vanilla js/html/css
 
 ### Why?
-Because
-
+Because people need to play this game
