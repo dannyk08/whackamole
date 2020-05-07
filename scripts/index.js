@@ -7,6 +7,7 @@ const GAME_PROPERTIES = {
       exist: new Audio('/soundsclips/exist.mp3'),
       try: new Audio('/soundsclips/try.mp3'),
       whatgot: new Audio('/soundsclips/whatgot.mp3'),
+      fail: new Audio('/soundsclips/8bit_gui_29.mp3'),
     },
     mole: {
       image: '/images/mr-meseeks.png'
@@ -112,14 +113,24 @@ class WhackAMoleGame {
 
   _gameClickListeners(e) {
     this.mallet.onMalletDown(e)
-
     let currentTarget = e.target
+
+    if (this.gameStartInterval === null && currentTarget.className !== 'mole') {
+      this._handleFailedWhack()
+    }
+
     if (currentTarget.id == 'startGame') {
       this._handleClickStartGame()
     }
+
     if (currentTarget.className.includes('mole')) {
       this._handleClickedMole(currentTarget)
     }
+  }
+
+  _handleFailedWhack() {
+    let failSound = this._handleSoundClipPlaybackConflicts(GAME_PROPERTIES.objects.soundclips.fail)
+    failSound.volume = .5
   }
 
   _handleGameOverEvent(e) {
@@ -185,6 +196,7 @@ class WhackAMoleGame {
       soundClip.pause()
       soundClip.currentTime = 0
     }
+    return soundClip
   }
 
   _gameHome(gameOver) {

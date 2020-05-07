@@ -1,3 +1,38 @@
+@keyframes taskIncompleteRotation {
+  0% {
+    transform       : rotate(0deg) scale(1);
+    transform-origin: center;
+  }
+
+  25% {
+    transform       : rotate(180deg) scale(1.25);
+    transform-origin: center;
+  }
+
+  100% {
+    transform       : rotate(360deg) scale(1);
+    transform-origin: center;
+  }
+}
+
+@keyframes taskCompleteRotation {
+  0% {
+    transform       : rotate(0deg) scale(1);
+    transform-origin: center;
+  }
+
+  65% {
+    transform       : rotate(-180deg) scale(1.25);
+    transform-origin: center;
+  }
+
+  100% {
+    transform       : rotate(-360deg) scale(1);
+    transform-origin: center;
+  }
+}
+
+
 @keyframes completeRotation {
   0% {
     transform: rotate(0deg) scale(1);
@@ -253,12 +288,9 @@ body {
   max-height: 12.5rem;
   position  : absolute;
   z-index   : 1;
-  bottom    : 2.5rem;
   transition: .25s all ease-in;
   opacity   : 1;
-  top       : 50%;
-  left      : 50%;
-  transform : translate(-50%, -50%);
+  animation : 2s taskIncompleteRotation none ease-out;
   transition: .125s ease-out;
 }
 
@@ -266,7 +298,8 @@ body {
   max-width : 45%;
   max-height: 1px;
   opacity   : 0.25;
-  transition: .125s all ease-in;
+  animation : 1s taskCompleteRotation ease-in;
+  transition: .125s ease-in;
 }
 
 .dirt {
